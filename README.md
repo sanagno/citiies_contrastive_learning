@@ -45,7 +45,7 @@ python -m torch.distributed.launch --nproc_per_node=2 main_vicreg_sn7.py --exp-d
 
 python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp-dir exp --weights finetune --train-perc 1 --epochs 20 --lr-backbone 0.03 --lr-head 0.08 --weight-decay 0 --arch resnet18
 
-| - | 1% Train Percentage | 10% Train Percentage
+| Accuracy | 1% Train Percentage | 10% Train Percentage
 | --- | --- | --- 
 | Top1 | 0.47 | 0.73 
 | Top5 | 0.73 | 0.95
