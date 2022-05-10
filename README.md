@@ -21,17 +21,23 @@ The VicReg implementation trained and evaluated seperately on ImageNet and SN7 D
 
 The VicReg implementation with a Resnet50 backbone trained and evaluated on ImageNet Datasets. Use the following command lines to run:
 
-1) Training:
+1) Training
 
+```
 python -m torch.distributed.launch --nproc_per_node=3 main_vicreg_unchanged.py --data-dir '/path/to/imagenet/train' --exp-dir 'path/to/exp --arch resnet50 --epochs 100 --batch-size 512 --base-lr 0.3
+```
 
 2) Semi-Supervised Setting (Backbone Weights Finetuned on train-perc% of the training data):
 
+```
 python evaluate.py --pretrained 'path/to/model.pth' --batch-size 128 --data-dir  '/path/to/imagenet/train' --exp-dir path/to/exp --weights finetune --train-perc 1 --epochs 20 --lr-backbone 0.03 --lr-head 0.08 --weight-decay 0
+```
 
 3) Linear Evaluation (Backbone Weights Frozen with Linear Layer Trained on Whole Training Set):
 
+```
 python evaluate.py --pretrained 'path/to/model.pth' --batch-size 128 --data-dir  '/path/to/imagenet/train' --exp-dir path/to/exp --weights frozen --epochs 20 --lr-head 0.02
+```
 
 # SN7
 
@@ -39,11 +45,15 @@ The VicReg implementation with a Resne18 backbone trained and evaluated on SN7 D
 
 1) Training: (At the end of 100 epochs: 16.88 Overall Loss, 0.003 MSE Loss, 0.56 standard-deviation loss, 2.72 covariance loss)
 
+```
 python -m torch.distributed.launch --nproc_per_node=2 main_vicreg_sn7.py --exp-dir exp/ --arch resnet18 --epochs 100 --batch-size 256 --base-lr 0.3
+```
 
 2) Semi-Supervised Setting (Backbone Weights Finetuned on train-perc% of the training data):
 
+```
 python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp-dir exp --weights finetune --train-perc 1 --epochs 20 --lr-backbone 0.03 --lr-head 0.08 --weight-decay 0 --arch resnet18
+```
 
 | - | 1% Train Percentage | 10% Train Percentage |
 | ------------- | ------------- | ------------- |
@@ -52,8 +62,9 @@ python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp
 
 3) Linear Evaluation (Backbone Weights Frozen with Linear Layer Trained on Whole Training Set): (Top1: 0.83, Top5: 0.99)
 
+```
 python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp-dir exp --weights frozen --epochs 100 --lr-head 0.08  --arch resnet18
-
+```
 
 
 
