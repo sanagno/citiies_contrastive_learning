@@ -50,10 +50,10 @@ python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp
 | Top1 | 0.47 | 0.73 |
 | Top5 | 0.73 | 0.95 |
 
-| First Header  | Second Header | Third Header |
+| Accuracy | 1% Train Percentage | 10% Train Percentage |
 | ------------- | ------------- | ------------- |
-| Content Cell  | Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  | Content Cell  |
+| Top1  | 0.47  | 0.73  |
+| Top5  | 0.72 | 0.95  |
 
 3) Linear Evaluation (Backbone Weights Frozen with Linear Layer Trained on Whole Training Set): (Top1: 0.83, Top5: 0.99)
 
