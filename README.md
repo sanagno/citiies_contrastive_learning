@@ -3,9 +3,7 @@
 ## Preprocessing
 
 The codes here are used to generate the csv file containing each image sample provided in the SN7 Dataset along with their labels which are possibly
-the states, cities or countries each image belongs to extracted from their corresponding GeoJSON files. Also, each 1024x1024 image is though to have 16 
-256x256 patches (as can be seen form the generated csv files) which are then loaded as seperate images to the models. ALso split the data indices into 
-training and validation sets.
+the states, cities or countries each image belongs to extracted from their corresponding GeoJSON files. These csv files are used by the custom SN7 Dataset classes defined in the scripts. Also, each 1024x1024 image is though to have 16 256x256 patches (as can be seen form the generated csv files) which are then loaded as seperate images to the models. Also split the data indices into training and validation sets.
 
 ## Supervised Setting
 
