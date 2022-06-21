@@ -153,7 +153,14 @@ def main(args):
             #optimizer.load_state_dict(ckpt["optimizer"])
         #else:
     start_epoch = 0
-
+    
+    running_loss = 0.0                          #FOR PRINTING RUNNING LOSSES DURING TRAINING!!!!
+    running_repr_loss = 0.0
+    running_std_loss = 0.0
+    running_cov_loss = 0.0
+    
+    previous_step = 0
+    
     start_time = last_logging = time.time()
     scaler = torch.cuda.amp.GradScaler()
     for epoch in range(start_epoch, args.epochs):
@@ -167,6 +174,12 @@ def main(args):
             optimizer.zero_grad()
             with torch.cuda.amp.autocast():
                 loss, repr_loss, std_loss, cov_loss = model.forward(x, y)
+            
+            running_loss += loss.item()                              #FOR PRINTING RUNNING LOSSES DURING TRAINING!!!
+            running_repr_loss += repr_loss.item()
+            running_std_loss += std_loss.item()
+            running_cov_loss += cov_loss.item()
+            
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -176,16 +189,32 @@ def main(args):
                 stats = dict(
                     epoch=epoch,
                     step=step,
-                    loss=loss.item(),
+                    #loss = loss.item(),
+                    loss = running_loss/(step-previous_step),
                     time=int(current_time - start_time),
                     lr=lr,
-                    repr_loss = repr_loss.item(),
-                    std_Loss = std_loss.item(),
-                    cov_loss = cov_loss.item()
+                    #repr_loss = repr_loss.item(),
+                    #std_Loss = std_loss.item(),
+                    #cov_loss = cov_loss.item()
+                    repr_loss = running_repr_loss/(step-previous_step),
+                    std_loss = running_std_loss/(step-previous_step),
+                    cov_loss = running_cov_loss/(step-previous_step)           #FOR PRINTING RUNNING LOSSES DURING TRAINING!!!
                 )
                 print(json.dumps(stats))
                 print(json.dumps(stats), file=stats_file)
                 last_logging = current_time
+                
+                running_loss = 0.0                          #FOR PRINTING RUNNING LOSSES DURING TRAINING!!!!
+                running_repr_loss = 0.0
+                running_std_loss = 0.0
+                running_cov_loss = 0.0
+                
+                #print(step-previous_step)
+                
+                previous_step = step
+                
+                
+                           
         if args.rank == 0:
             state = dict(
                 epoch=epoch + 1,
@@ -194,18 +223,20 @@ def main(args):
             )
             torch.save(state, args.exp_dir / "model.pth")
     if args.rank == 0:
-        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet18_3.pth")
+        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet18_new_4096_200.pth")
 
 
 def adjust_learning_rate(args, optimizer, loader, step):
     max_steps = args.epochs * len(loader)
     warmup_steps = 10 * len(loader) 
-    base_lr = args.base_lr * args.batch_size * 20 / 1024
+    base_lr = args.base_lr * args.batch_size * 16 / 1024
     #print('base_lr', base_lr)
     #base_lr = args.base_lr * args.batch_size / 1024
     if step < warmup_steps:
-        lr = base_lr * (step+1) / warmup_steps
+        lr = base_lr * (step+1) / warmup_steps #* 5      #DELETE THE 5 AND THE IF STATEMEENT LATER!!!!!!!!!!!!!!!!
         #print('lr after', lr)
+    if step == warmup_steps:
+        lr = args.base_lr
     else:
         step -= warmup_steps
         max_steps -= warmup_steps
