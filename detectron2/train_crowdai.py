@@ -27,7 +27,13 @@ import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog, DatasetCatalog
-from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, hooks, launch
+from detectron2.engine import (
+    DefaultTrainer,
+    default_argument_parser,
+    default_setup,
+    hooks,
+    launch,
+)
 from detectron2.evaluation import (
     CityscapesInstanceEvaluator,
     CityscapesSemSegEvaluator,
@@ -51,32 +57,35 @@ from detectron2.data.datasets import register_coco_instances
 
 from detectron2.structures import BoxMode
 
+
 def get_buildings_dicts(img_dir):
-    json_file = os.path.join(img_dir, "annotation-small.json")
+    json_file = os.path.join(img_dir, "annotation.json")
     with open(json_file) as f:
         imgs_anns = json.load(f)
 
     dataset_dicts = []
-    
-    for img in imgs_anns['images']:
-        id_ = img['id']
-        annotations = list(filter(lambda x: x['image_id'] == id_, imgs_anns['annotations']))
-    
+
+    for img in imgs_anns["images"]:
+        id_ = img["id"]
+        annotations = list(
+            filter(lambda x: x["image_id"] == id_, imgs_anns["annotations"])
+        )
+
         record = {}
-        
+
         filename = os.path.join(img_dir, "images", img["file_name"])
         height, width = cv2.imread(filename).shape[:2]
-        
+
         record["file_name"] = filename
         record["image_id"] = id_
         record["height"] = height
         record["width"] = width
-      
+
         objs = []
         for anno in annotations:
-#             assert not anno["region_attributes"]
-            px = anno['segmentation'][0][::2]
-            py = anno['segmentation'][0][1::2]
+            #             assert not anno["region_attributes"]
+            px = anno["segmentation"][0][::2]
+            py = anno["segmentation"][0][1::2]
 
             poly = [(x + 0.5, y + 0.5) for x, y in zip(px, py)]
             poly = [p for x in poly for p in x]
@@ -126,7 +135,9 @@ def build_evaluator(cfg, dataset_name, output_folder=None):
         return LVISEvaluator(dataset_name, output_dir=output_folder)
     if len(evaluator_list) == 0:
         raise NotImplementedError(
-            "no Evaluator for the dataset {} with the type {}".format(dataset_name, evaluator_type)
+            "no Evaluator for the dataset {} with the type {}".format(
+                dataset_name, evaluator_type
+            )
         )
     elif len(evaluator_list) == 1:
         return evaluator_list[0]
@@ -205,8 +216,15 @@ def main(args):
 
 
 for d in ["train", "val"]:
-    DatasetCatalog.register("crowdai_buildings_detection_" + d, lambda d=d: get_buildings_dicts("/local/home/stuff/crowdai_buildings_segmentation/" + d))
-    MetadataCatalog.get("crowdai_buildings_detection_" + d).set(thing_classes=["building"])
+    DatasetCatalog.register(
+        "crowdai_buildings_detection_" + d,
+        lambda d=d: get_buildings_dicts(
+            "/local/home/stuff/crowdai_buildings_segmentation/" + d
+        ),
+    )
+    MetadataCatalog.get("crowdai_buildings_detection_" + d).set(
+        thing_classes=["building"], evaluator_type="coco"
+    )
 
 
 if __name__ == "__main__":
@@ -222,5 +240,5 @@ if __name__ == "__main__":
     )
 
 
-# To run 
+# To run
 # CUDA_VISIBLE_DEVICES=1 python3 train_crowdai.py --config-file configs/train_config.yaml --num-gpus 1
