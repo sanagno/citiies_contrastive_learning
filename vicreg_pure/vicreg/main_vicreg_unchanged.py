@@ -187,6 +187,15 @@ class VICReg(nn.Module):
         self.backbone, self.embedding = resnet.__dict__[args.arch](
             zero_init_residual=True
         )
+        
+        #REMOVE WHEN TRAINING BACKBONE FROM SCRACTH!!!!
+        #state_dict = torch.load('resnet50_imagenet_pretrained_vicreg.pth', map_location="cpu")     
+        #if "model" in state_dict:
+            #state_dict = state_dict["model"]
+            #state_dict = {key.replace("module.backbone.", ""): value for (key, value) in state_dict.items()}
+        #self.backbone.load_state_dict(state_dict, strict=False)
+        #REMOVE WHEN TRAINING BACKBONE FROM SCRACTH!!!!
+        
         self.projector = Projector(args, self.embedding)
 
     def forward(self, x, y):
