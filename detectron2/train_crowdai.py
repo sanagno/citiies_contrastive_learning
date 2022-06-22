@@ -19,11 +19,14 @@ You may want to write your own script with your datasets and other customization
 import logging
 import os
 from collections import OrderedDict
+import numpy as np
+import json
+import cv2
 
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
-from detectron2.data import MetadataCatalog
+from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, hooks, launch
 from detectron2.evaluation import (
     CityscapesInstanceEvaluator,
@@ -41,19 +44,53 @@ from detectron2.modeling import GeneralizedRCNNWithTTA
 from detectron2.data.datasets import register_coco_instances
 
 
-register_coco_instances(
-    "crowdai_buildings_detection_train", 
-    {}, 
-    "/local/home/stuff/crowdai_buildings_segmentation/train/annotation.json",
-    "/local/home/stuff/crowdai_buildings_segmentation/train/images/"
-)
+# if your dataset is in COCO format, this cell can be replaced by the following three lines:
+# from detectron2.data.datasets import register_coco_instances
+# register_coco_instances("my_dataset_train", {}, "json_annotation_train.json", "path/to/image/dir")
+# register_coco_instances("my_dataset_val", {}, "json_annotation_val.json", "path/to/image/dir")
 
-register_coco_instances(
-    "crowdai_buildings_detection_val", 
-    {}, 
-    "/local/home/stuff/crowdai_buildings_segmentation/val/annotation.json",
-     "/local/home/stuff/crowdai_buildings_segmentation/val/images/"
-)
+from detectron2.structures import BoxMode
+
+def get_buildings_dicts(img_dir):
+    json_file = os.path.join(img_dir, "annotation-small.json")
+    with open(json_file) as f:
+        imgs_anns = json.load(f)
+
+    dataset_dicts = []
+    
+    for img in imgs_anns['images']:
+        id_ = img['id']
+        annotations = list(filter(lambda x: x['image_id'] == id_, imgs_anns['annotations']))
+    
+        record = {}
+        
+        filename = os.path.join(img_dir, "images", img["file_name"])
+        height, width = cv2.imread(filename).shape[:2]
+        
+        record["file_name"] = filename
+        record["image_id"] = id_
+        record["height"] = height
+        record["width"] = width
+      
+        objs = []
+        for anno in annotations:
+#             assert not anno["region_attributes"]
+            px = anno['segmentation'][0][::2]
+            py = anno['segmentation'][0][1::2]
+
+            poly = [(x + 0.5, y + 0.5) for x, y in zip(px, py)]
+            poly = [p for x in poly for p in x]
+
+            obj = {
+                "bbox": [np.min(px), np.min(py), np.max(px), np.max(py)],
+                "bbox_mode": BoxMode.XYXY_ABS,
+                "segmentation": [poly],
+                "category_id": 0,
+            }
+            objs.append(obj)
+        record["annotations"] = objs
+        dataset_dicts.append(record)
+    return dataset_dicts
 
 
 def build_evaluator(cfg, dataset_name, output_folder=None):
@@ -165,6 +202,11 @@ def main(args):
             [hooks.EvalHook(0, lambda: trainer.test_with_TTA(cfg, trainer.model))]
         )
     return trainer.train()
+
+
+for d in ["train", "val"]:
+    DatasetCatalog.register("crowdai_buildings_detection_" + d, lambda d=d: get_buildings_dicts("/local/home/stuff/crowdai_buildings_segmentation/" + d))
+    MetadataCatalog.get("crowdai_buildings_detection_" + d).set(thing_classes=["building"])
 
 
 if __name__ == "__main__":
