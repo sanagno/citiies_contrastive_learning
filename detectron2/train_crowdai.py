@@ -65,11 +65,17 @@ def get_buildings_dicts(img_dir):
 
     dataset_dicts = []
 
+    all_annotations = {}
+    for ann in imgs_anns['annotations']:
+        id_ = ann['image_id']
+        
+        if id_ in all_annotations:
+            all_annotations[id_].append(ann)
+        else:
+            all_annotations[id_] = [ann]
+
     for img in imgs_anns["images"]:
         id_ = img["id"]
-        annotations = list(
-            filter(lambda x: x["image_id"] == id_, imgs_anns["annotations"])
-        )
 
         record = {}
 
@@ -82,21 +88,21 @@ def get_buildings_dicts(img_dir):
         record["width"] = width
 
         objs = []
-        for anno in annotations:
-            #             assert not anno["region_attributes"]
-            px = anno["segmentation"][0][::2]
-            py = anno["segmentation"][0][1::2]
+        if id_ in all_annotations:        
+            for anno in all_annotations[id_]:
+                px = anno["segmentation"][0][::2]
+                py = anno["segmentation"][0][1::2]
 
-            poly = [(x + 0.5, y + 0.5) for x, y in zip(px, py)]
-            poly = [p for x in poly for p in x]
+                poly = [(x + 0.5, y + 0.5) for x, y in zip(px, py)]
+                poly = [p for x in poly for p in x]
 
-            obj = {
-                "bbox": [np.min(px), np.min(py), np.max(px), np.max(py)],
-                "bbox_mode": BoxMode.XYXY_ABS,
-                "segmentation": [poly],
-                "category_id": 0,
-            }
-            objs.append(obj)
+                obj = {
+                    "bbox": [np.min(px), np.min(py), np.max(px), np.max(py)],
+                    "bbox_mode": BoxMode.XYXY_ABS,
+                    "segmentation": [poly],
+                    "category_id": 0,
+                }
+                objs.append(obj)
         record["annotations"] = objs
         dataset_dicts.append(record)
     return dataset_dicts
