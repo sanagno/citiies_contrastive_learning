@@ -44,7 +44,7 @@ class SN7Dataset(Dataset):
     def __init__(self, transform=None, train=True):
         
         if train == True:
-            self.img_ids_labels = pd.read_csv("../../ids_and_labels_train_repeated.csv", header = None) 
+            self.img_ids_labels = pd.read_csv("ids_and_labels_train_subset.csv", header = None) 
         else:
             self.img_ids_labels = pd.read_csv("../../ids_and_labels_val_repeated.csv", header = None)
             

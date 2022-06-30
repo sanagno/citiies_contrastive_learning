@@ -223,7 +223,7 @@ def main(args):
             )
             torch.save(state, args.exp_dir / "model.pth")
     if args.rank == 0:
-        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet18_new_4096_200.pth")
+        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet50_100epochs_16_factor.pth")
 
 
 def adjust_learning_rate(args, optimizer, loader, step):

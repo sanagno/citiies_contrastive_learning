@@ -1,7 +1,8 @@
 _BASE_: "./Base-RCNN-FPN.yaml"
 OUTPUT_DIR: "test_bigger_lr"
 MODEL:
-  WEIGHTS: "pretrained_resnets/imagenet_50.pkl"
+  #WEIGHTS: "pretrained_resnets/imagenet_50.pkl"
+  WEIGHTS: '/local/home/bsoyuer/citiies_contrastive_learning/vicreg_pure/vicreg/exp/resnet50_100epochs_16_factor.pth'
   MASK_ON: True
   LOAD_PROPOSALS: False
   RESNETS:
@@ -9,17 +10,19 @@ MODEL:
   BACKBONE:
     FREEZE_AT: 0
   ROI_HEADS:
-    NUM_CLASSES: 2
+    NUM_CLASSES: 2  
 DATASETS:
-  TRAIN: ("crowdai_buildings_detection_train",)
-  TEST: ("crowdai_buildings_detection_val",)
+  TRAIN: ("crowdai_train",)
+  TEST: ("crowdai_val",)
 TEST:
   EVAL_PERIOD: 5000
 DATALOADER:
   NUM_WORKERS: 8
 SOLVER:
-  IMS_PER_BATCH: 12
-  BASE_LR: 0.02
+  IMS_PER_BATCH: 10
+  BASE_LR: 0.04
+  STEPS: (60000, 80000)
+  MAX_ITER: 90000
   MOMENTUM: 0.9
   WEIGHT_DECAY: 0.0001
   CLIP_GRADIENTS:

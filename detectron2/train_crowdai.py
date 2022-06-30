@@ -223,12 +223,12 @@ def main(args):
 
 for d in ["train", "val"]:
     DatasetCatalog.register(
-        "crowdai_buildings_detection_" + d,
+        "crowdai_" + d,
         lambda d=d: get_buildings_dicts(
-            "/local/home/stuff/crowdai_buildings_segmentation/" + d
+            "/local/home/stuff/datasets/crowdai/" + d
         ),
     )
-    MetadataCatalog.get("crowdai_buildings_detection_" + d).set(
+    MetadataCatalog.get("crowdai_" + d).set(
         thing_classes=["building"], evaluator_type="coco"
     )
 
