@@ -23,7 +23,7 @@ INPUT:
     - 0.9
     - 0.9
     TYPE: relative_range
-  FORMAT: BGR
+  FORMAT: RGB
   MASK_FORMAT: polygon
   MAX_SIZE_TEST: 1333
   MAX_SIZE_TRAIN: 1333
@@ -80,13 +80,13 @@ MODEL:
       STUFF_AREA_LIMIT: 4096
     INSTANCE_LOSS_WEIGHT: 1.0
   PIXEL_MEAN:
-  - 103.53
-  - 116.28
-  - 123.675
+  - 0.485
+  - 0.456
+  - 0.406
   PIXEL_STD:
-  - 1.0
-  - 1.0
-  - 1.0
+  - 0.229
+  - 0.224
+  - 0.225
   PROPOSAL_GENERATOR:
     MIN_SIZE: 0
     NAME: RPN
@@ -264,22 +264,22 @@ MODEL:
     NAME: SemSegFPNHead
     NORM: GN
     NUM_CLASSES: 54
-  WEIGHTS: /local/home/bsoyuer/citiies_contrastive_learning/vicreg_pure/vicreg/exp/resnet50_100epochs_16_factor.pth
+  WEIGHTS: /local/home/bsoyuer/citiies_contrastive_learning/vicreg_pure/vicreg/exp/resnet50_converted.pkl
 OUTPUT_DIR: test_bigger_lr
 SEED: -1
 SOLVER:
   AMP:
     ENABLED: false
-  BASE_LR: 0.02
+  BASE_LR: 0.01
   BIAS_LR_FACTOR: 1.0
   CHECKPOINT_PERIOD: 5000
   CLIP_GRADIENTS:
-    CLIP_TYPE: value
-    CLIP_VALUE: 1.0
-    ENABLED: false
+    CLIP_TYPE: norm
+    CLIP_VALUE: 5.0
+    ENABLED: true
     NORM_TYPE: 2.0
   GAMMA: 0.1
-  IMS_PER_BATCH: 12
+  IMS_PER_BATCH: 16
   LR_SCHEDULER_NAME: WarmupMultiStepLR
   MAX_ITER: 90000
   MOMENTUM: 0.9
@@ -291,7 +291,7 @@ SOLVER:
   WARMUP_FACTOR: 0.001
   WARMUP_ITERS: 1000
   WARMUP_METHOD: linear
-  WEIGHT_DECAY: 0.0001
+  WEIGHT_DECAY: 1.0e-06
   WEIGHT_DECAY_BIAS: null
   WEIGHT_DECAY_NORM: 0.0
 TEST:
