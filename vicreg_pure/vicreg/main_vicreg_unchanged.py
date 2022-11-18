@@ -99,6 +99,11 @@ def main(args):
     )
 
     model = VICReg(args).cuda(gpu)
+    
+    ckpt = torch.load('./exp/resnet50_fullckpt.pth', map_location="cpu")
+    new = {k.split('module.')[1]:v for k,v in ckpt['model'].items()}
+    model.load_state_dict(new)
+    
     model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
     optimizer = LARS(
@@ -108,16 +113,25 @@ def main(args):
         weight_decay_filter=exclude_bias_and_norm,
         lars_adaptation_filter=exclude_bias_and_norm,
     )
+    
+    optimizer.load_state_dict(ckpt["optimizer"])
+    
+    print('awesome')
+    
 
-    if (args.exp_dir / "model.pth").is_file():
-        if args.rank == 0:
-            print("resuming from checkpoint")
-        ckpt = torch.load(args.exp_dir / "model.pth", map_location="cpu")
-        start_epoch = ckpt["epoch"]
-        model.load_state_dict(ckpt["model"])
-        optimizer.load_state_dict(ckpt["optimizer"])
-    else:
-        start_epoch = 0
+    #if (args.exp_dir / "model.pth").is_file():
+        #if args.rank == 0:
+            #print("resuming from checkpoint")
+        #ckpt = torch.load(args.exp_dir / "model.pth", map_location="cpu")
+        #start_epoch = ckpt["epoch"]
+        #model.load_state_dict(ckpt["model"])
+        #optimizer.load_state_dict(ckpt["optimizer"])
+    #else:
+    start_epoch = 0
+    
+    start_epoch = ckpt["epoch"]
+    
+    print('yeoo')
 
     start_time = last_logging = time.time()
     scaler = torch.cuda.amp.GradScaler()

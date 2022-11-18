@@ -41,10 +41,10 @@ import torchvision
 
 class SN7Dataset(Dataset):
     
-    def __init__(self, transform=None, train=True):
+    def __init__(self, transform=None, train=True, train_data_dir=None):
         
         if train == True:
-            self.img_ids_labels = pd.read_csv("ids_and_labels_train_subset.csv", header = None) 
+            self.img_ids_labels = pd.read_csv(train_data_dir, header = None) 
         else:
             self.img_ids_labels = pd.read_csv("../../ids_and_labels_val_repeated.csv", header = None)
             
@@ -399,19 +399,24 @@ def main_worker(gpu, args):
 
     # Data loading code
     
-    ids_and_labels_train = pd.read_csv('../../ids_and_labels_train_repeated.csv',delimiter=',',header=1)
-    ids_and_labels_val = pd.read_csv('../../ids_and_labels_val_repeated.csv',delimiter=',',header=1)
+    #ids_and_labels_train = pd.read_csv('../../ids_and_labels_train_repeated.csv',delimiter=',',header=1)
+    #ids_and_labels_val = pd.read_csv('../../ids_and_labels_val_repeated.csv',delimiter=',',header=1)
     
-    ids_and_labels_train_arr = np.array(ids_and_labels_train.values)
-    ids_and_labels_val_arr = np.array(ids_and_labels_val.values)
+    #ids_and_labels_train_arr = np.array(ids_and_labels_train.values)
+    #ids_and_labels_val_arr = np.array(ids_and_labels_val.values)
     
-    num_rows = ids_and_labels_train_arr.shape[0]
-    random_indices = np.random.choice(num_rows, size=int(np.round(args.train_percent*num_rows/100.0)), replace=False)
+    #num_rows = ids_and_labels_train_arr.shape[0]
+    #random_indices = np.random.choice(num_rows, size=int(np.round(args.train_percent*num_rows/100.0)), replace=False)
     
     
-    selected_training_samples = ids_and_labels_train_arr[random_indices,:]
+    #selected_training_samples = ids_and_labels_train_arr[random_indices,:]
     
-    np.savetxt("ids_and_labels_train_subset.csv", selected_training_samples, delimiter=",", fmt='%s')
+    #np.savetxt("ids_and_labels_train_subset.csv", selected_training_samples, delimiter=",", fmt='%s')
+    
+    if args.train_percent < 11:
+        directory = "ids_and_labels_train_subset_10.csv"
+    else:
+        directory = "../../ids_and_labels_train_repeated.csv"
     
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -435,8 +440,8 @@ def main_worker(gpu, args):
             ]
         )
 
-    train_dataset = SN7Dataset(train=True, transform = train_transforms)
-    val_dataset = SN7Dataset(train=False, transform = val_transforms)
+    train_dataset = SN7Dataset(train=True, transform = train_transforms, train_data_dir = directory)
+    val_dataset = SN7Dataset(train=False, transform = val_transforms, train_data_dir = directory)
     
     print('TrainDatasetSize:', train_dataset.__len__())
     print('ValDatasetSize:', val_dataset.__len__())

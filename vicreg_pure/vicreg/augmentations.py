@@ -53,12 +53,12 @@ class TrainTransform(object):
                 transforms.RandomApply(
                     [
                         transforms.ColorJitter(
-                            brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1
+                            brightness=0.6, contrast=0.6, saturation=0.4, hue=0.2
                         )
                     ],
                     p=0.8,
                 ),
-                transforms.RandomGrayscale(p=0.2),
+                transforms.RandomGrayscale(p=0.3),
                 GaussianBlur(p=1.0),
                 Solarization(p=0.0),
                 #transforms.ToTensor(),           #COMMENT OUT IF USING SN7 DATASET!!!!!!!
@@ -76,14 +76,14 @@ class TrainTransform(object):
                 transforms.RandomApply(
                     [
                         transforms.ColorJitter(
-                            brightness=0.4, contrast=0.4, saturation=0.2, hue=0.1
+                            brightness=0.6, contrast=0.6, saturation=0.4, hue=0.2
                         )
                     ],
                     p=0.8,
                 ),
                 transforms.RandomGrayscale(p=0.2),
                 GaussianBlur(p=0.1),
-                Solarization(p=0.2),
+                Solarization(p=0.3),
                 #transforms.ToTensor(),
                 transforms.Normalize(
                     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]

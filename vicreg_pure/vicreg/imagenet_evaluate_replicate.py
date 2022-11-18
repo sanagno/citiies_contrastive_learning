@@ -288,15 +288,16 @@ def main_worker(gpu, args):
     torch.cuda.set_device(gpu)
     torch.backends.cudnn.benchmark = True
 
-    supervised_model_pretrained = torchvision.models.resnet50(pretrained=True)
-    torch.save(supervised_model_pretrained.state_dict(), 'resnet50_imagenet_pretrained_supervised.pth')
+    #supervised_model_pretrained = torchvision.models.resnet50(pretrained=True)
+    #torch.save(supervised_model_pretrained.state_dict(), 'resnet50_imagenet_pretrained_supervised.pth')
 
 
 # In[8]:
 
 
     backbone, embedding = resnet.__dict__['resnet50'](zero_init_residual=True)
-    state_dict = torch.load('resnet50_imagenet_pretrained_supervised.pth', map_location="cpu")
+    #state_dict = torch.load('resnet50_imagenet_pretrained_supervised.pth', map_location="cpu")
+    state_dict = torch.load('resnet50_imagenet_pretrained_vicreg.pth', map_location="cpu")
     if "model" in state_dict:
         state_dict = state_dict["model"]
         state_dict = {key.replace("module.backbone.", ""): value for (key, value) in state_dict.items()}

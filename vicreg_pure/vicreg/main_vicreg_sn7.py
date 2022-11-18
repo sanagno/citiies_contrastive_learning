@@ -159,7 +159,7 @@ def main(args):
     running_std_loss = 0.0
     running_cov_loss = 0.0
     
-    previous_step = 0
+    previous_step = 1
     
     start_time = last_logging = time.time()
     scaler = torch.cuda.amp.GradScaler()
@@ -223,13 +223,14 @@ def main(args):
             )
             torch.save(state, args.exp_dir / "model.pth")
     if args.rank == 0:
-        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet50_100epochs_16_factor.pth")
+        torch.save(model.module.backbone.state_dict(), args.exp_dir / "resnet50_vicreg_sn7_1000.pth")
 
 
 def adjust_learning_rate(args, optimizer, loader, step):
     max_steps = args.epochs * len(loader)
     warmup_steps = 10 * len(loader) 
-    base_lr = args.base_lr * args.batch_size * 16 / 1024
+    #base_lr = args.base_lr * args.batch_size * 16 / 1024
+    base_lr = args.base_lr * args.batch_size * 8 / 256
     #print('base_lr', base_lr)
     #base_lr = args.base_lr * args.batch_size / 1024
     if step < warmup_steps:
