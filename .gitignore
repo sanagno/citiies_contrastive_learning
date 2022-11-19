@@ -28,5 +28,6 @@ vicreg_pure/vicreg/__pycache__/
 vicreg_pure/vicreg/checkpoint/
 vicreg_pure/vicreg/fmow/
 vicreg_pure/vicreg/embeddings_csvs/
-Supervised_Backbone/
+Supervised_Backbone/models/
+torch_2_keras_conversion/torchToOnnx.onnx
 
