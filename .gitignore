@@ -31,3 +31,5 @@ vicreg_pure/vicreg/embeddings_csvs/
 Supervised_Backbone/models/
 torch_2_keras_conversion/torchToOnnx.onnx
 .cache/
+.ipynb_checkpoints/
+.vscode/
