@@ -33,3 +33,4 @@ torch_2_keras_conversion/torchToOnnx.onnx
 .cache/
 .ipynb_checkpoints/
 .vscode/
+vicreg_pure/vicreg/README.md

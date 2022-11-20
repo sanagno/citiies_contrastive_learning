@@ -64,6 +64,7 @@ python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp
 python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp-dir exp --weights frozen --epochs 100 --lr-head 0.08  --arch resnet18
 ```
 
+For an elaborate presentation and discussion of the experimental performance of VICREG model based on varying remote sensing datasets used for backbone training, varying backbone architectures and augmentation regimes as well as comparative performances with respect to pretrained supervised backbones on well-established datasets, please refer to the file 'final_report.pdf' above.
 
 
 
