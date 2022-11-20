@@ -1,5 +1,9 @@
 # citiies_contrastive_learning
 
+## TL;DR 
+
+The below serves as a very rough and simple explanation for the project and the repository. For an elaborate presentation and discussion of the experimental performance of VICREG model based on varying remote sensing datasets used for backbone training, varying backbone architectures and augmentation regimes as well as comparative performances with respect to pretrained supervised backbones on well-established datasets, please refer to the file 'final_report.pdf' above.
+
 ## Preprocessing
 
 The codes here are used to generate the csv file containing each image sample provided in the SN7 Dataset along with their labels which are possibly
@@ -63,8 +67,11 @@ python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp
 ```
 python evaluate_sn7.py --pretrained exp/trained_model.pth --batch-size 128 --exp-dir exp --weights frozen --epochs 100 --lr-head 0.08  --arch resnet18
 ```
+## Downstream Tasks
 
-For an elaborate presentation and discussion of the experimental performance of VICREG model based on varying remote sensing datasets used for backbone training, varying backbone architectures and augmentation regimes as well as comparative performances with respect to pretrained supervised backbones on well-established datasets, please refer to the file 'final_report.pdf' above.
+In this project, we mainly investigated any and all improvements a VICREG pretrained backbone had over the traditionally preferred backbones trained in a supervised manner, in particular for the case of downstream task performances in remote sensing data. For this purpose, we have used 3 tasks, each of which utilizes a large scale, non-synthetic remote sensing data. For a well-generalizable study, we have used three basic downstream tasks, namely, classification, detection and segmentation tasks, the code for each of which can be found under the folders 'eurosat_landcover_clsf_task', 'detectron2_crowdai_detection_task' and 'FloodNet_segmentation_task' respectively.
+
+
 
 
 
